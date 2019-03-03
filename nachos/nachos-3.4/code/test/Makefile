@@ -14,7 +14,6 @@
 # and change the flags to ld and the build procedure for as
 
 GCCDIR = ../../../gnu-decstation-ultrix/decstation-ultrix/2.95.3/
-#GCCDIR = ~/Desktop/nachos/gnu-decstation-ultrix/decstation-ultrix/2.95.3/
 
 LDFLAGS = -T script -N
 ASFLAGS = -mips2
@@ -28,7 +27,6 @@ CPPFLAGS = $(INCDIR)
 
 PATH = $(GCCDIR):/lib:/usr/bin:/bin
 
-#CC = $(GCCDIR)gcc -B~/Desktop/nachos/gnu-decstation-ultrix/
 CC = $(GCCDIR)gcc -B../../../gnu-decstation-ultrix/
 AS = $(GCCDIR)as
 LD = $(GCCDIR)ld
@@ -37,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort sub
+all: halt shell matmult sort sub readint printint
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -69,7 +67,19 @@ matmult: matmult.o start.o
 	../bin/coff2noff matmult.coff matmult
 
 sub.o: sub.c
-	 $(CC) $(CFLAGS) -c sub.c
-sub: sub.o start.o 
+	$(CC) $(CFLAGS) -c sub.c
+sub: sub.o start.o
 	$(LD) $(LDFLAGS) start.o sub.o -o sub.coff
-	../bin/coff2noff sub.coff sub 
+	../bin/coff2noff sub.coff sub
+
+readint.o: readint.c
+	$(CC) $(CFLAGS) -c readint.c
+readint: readint.o start.o
+	$(LD) $(LDFLAGS) start.o readint.o -o readint.coff
+	../bin/coff2noff readint.coff readint
+
+printint.o: printint.c
+	$(CC) $(CFLAGS) -c printint.c
+printint: printint.o start.o
+	$(LD) $(LDFLAGS) start.o printint.o -o printint.coff
+	../bin/coff2noff printint.coff printint

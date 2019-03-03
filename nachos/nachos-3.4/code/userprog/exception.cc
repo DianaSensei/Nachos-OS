@@ -56,18 +56,20 @@
 //    if ((which == SyscallException) && (type == SC_Halt)) {
 //	DEBUG('a', "Shutdown, initiated by user program.\n");
 //   	interrupt->Halt();
-//    } else {
+//   } else {
 //	printf("Unexpected user mode exception %d %d\n", which, type);
 //	ASSERT(FALSE);
 //    }
 //}
-void
+#define MAX_INT_LENGTH 9
+#define MASK_GET_NUM 0xF
+void 
 ExceptionHandler(ExceptionType which)
 {
-	int type = machine->ReadRegister(2);
+	int type =machine->ReadRegister(2);
 	if(which == SyscallException) {
 		switch(type) { 
-			case SC_Sub:           
+			case SC_Sub:{           
 			int op1;
 			op1 = machine->ReadRegister(4);    
 			int  op2;
@@ -76,7 +78,58 @@ ExceptionHandler(ExceptionType which)
 			result= op1 - op2;    
 			machine->WriteRegister(2,result);
   			interrupt->Halt();
+			}
 			break;
+
+			case SC_ReadInt:
+			{
+				DEBUG('a', "Read integer number from console.\n");
+				int number = 0;
+				int nDigit = 0;
+				int i;
+				char* bufer = new char[MAX_INT_LENGTH];
+				nDigit = synchcons->Read(bufer, MAX_INT_LENGTH);
+				i = bufer[0] == '-' ? 1:0 ;
+				for (; i < nDigit; ++i)
+				{
+					number = number*10 + (int) (bufer[i] & MASK_GET_NUM);
+				}
+				number = bufer[0] == '-' ? -1*number : number;
+				machine->WriteRegister(2, number);
+				delete bufer;
+				interrupt->Halt();
+			}
+			break;
+
+			case SC_PrintInt:
+			{
+				char s[MAX_INT_LENGTH], neg, tmp;
+				neg = '-';
+				int i, n, mid, sz;
+				i = n = 0;
+				DEBUG('a', "Read argument value at r4");
+				n = machine->ReadRegister(4);
+				if (n < 0)
+				{
+					synchcons->Write(&neg,1);
+					n = -n;
+				}
+				do {
+					s[i++] = n%10 + '0';
+				}	while (( n /= 10) > 0);
+				sz = i;
+				s[sz] = '\n';
+				mid = i / 2;
+				while (i-->mid)
+				{
+					tmp = s[sz-i-1];
+					s[sz-i-1] = s[i];
+					s[i] = tmp;
+				}
+				synchcons->Write(s, sz);
+			}
+			break;
+
 			case SC_Halt:
 			DEBUG('a', "Shutdown, initiated by user program.\n");
 			interrupt->Halt();
@@ -88,3 +141,4 @@ ExceptionHandler(ExceptionType which)
 	machine->registers[PCReg] =       machine->registers[NextPCReg];
 	machine->registers[NextPCReg] += 4;
 }
+

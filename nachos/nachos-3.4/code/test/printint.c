@@ -1,8 +1,6 @@
 #include"syscall.h"
-
 int
 main()
 {
-	int result;
-	result = Sub(14,4);
+	PrintInt(5);
 }
