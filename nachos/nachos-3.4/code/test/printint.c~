@@ -2,5 +2,5 @@
 int
 main()
 {
-	PrintInt(15);
+	PrintInt(5);
 }
