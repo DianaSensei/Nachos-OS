@@ -88,9 +88,23 @@ ExceptionHandler(ExceptionType which)
 				int nDigit = 0;
 				char* bufer = new char[MAX_LENGTH];
 				nDigit = synchcons->Read(bufer, MAX_LENGTH);
-				int i = bufer[0] == '-' ? 1:0 ;
+				int i = 0;
+				if(bufer[0] == '-')
+					i = 1;
+				else if(bufer[0] <'0'||bufer[0]>'9')
+					{
+						machine->WriteRegister(2, 0);
+						delete bufer;
+						break;
+					}
 				for (; i < nDigit; ++i)
 				{	
+					if(bufer[i]<'0' || bufer[i] >'9')
+					{
+						machine->WriteRegister(2, 0);
+						delete bufer;
+						break;
+					}
 					number = number*10 + (int) (bufer[i] & MASK_GET_NUM);
 				}
 				number = bufer[0] == '-' ? -1*number : number;
