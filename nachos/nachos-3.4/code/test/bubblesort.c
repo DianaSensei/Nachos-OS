@@ -7,11 +7,16 @@ int main(){
 
 	int a[MAX_ELEMENT],n = 0;
 	n = ReadArray(a);
-	if(n == 0) PrintString("n > 100, vui long nhap lai.");
+	if(n == 0) 
+	{
+		PrintString("n > 100, vui long nhap lai.\n");
+		n = ReadArray(a);
+	}
 //Your code
 //Bubble sort
 //...
 	BubbleSort(a, n);
+	PrintString("\n");
 	PrintArray(a, n);
 	return 0;
 }
@@ -34,6 +39,7 @@ int ReadArray(int *a){
 }
 void PrintArray(int a[],int n){
 	int i;
+	PrintString("Ket qua sau khi xep xep :\n");
 	for (i = 0; i < n ; i++)
 	{
 		PrintString("a[");
